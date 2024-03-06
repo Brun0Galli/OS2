@@ -1,3 +1,4 @@
+import os
 
 def round_robin(processes, quantum):
 
@@ -64,6 +65,7 @@ def menu():
                 burst_time = int(input("Ingrese el tiempo de ráfaga: "))
                 processes.append((process_name, burst_time))
             print("El tiempo promedio de completación es: ", round_robin(processes, quantum))
+            return True
 
         case 2:
             print("Entering First Come First Served...")
@@ -74,6 +76,7 @@ def menu():
                 burst_time = int(input("Ingrese el tiempo de ráfaga: "))
                 processes.append((process_name, burst_time))
             print("El tiempo promedio de completación es: ", first_come_first_served(processes))
+            return True
 
         case 3:
             print("Entering Shortest Job First...")
@@ -84,10 +87,13 @@ def menu():
                 burst_time = int(input("Ingrese el tiempo de ráfaga: "))
                 processes.append((process_name, burst_time))
             print("El tiempo promedio de completación es: ", shortest_job_first(processes))
+            return True
 
         case 4:
             print("Saliendo...")
             return False
 valido = True
 while valido :
-  valido =  menu()
+    os.system('cls')
+    valido =  menu()
+    input("Presione enter para continuar...")
