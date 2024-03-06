@@ -82,43 +82,40 @@ def menu():
 
         # Opción 1: Round Robin
         if opc == 1:
-            while True:
-                cant_procesos = int(input("Cuantos procesos desea ingresar: "))
-                if cant_procesos < 1 or cant_procesos > 5:
-                    print("Número de procesos inválido. Debe ser entre 1 y 5.")
-                    continue
+           while True:
+        cant_procesos = int(input("Cuantos procesos desea ingresar: "))
+        if cant_procesos < 1 or cant_procesos > 5:
+            print("Número de procesos inválido. Debe ser entre 1 y 5.")
+            continue
 
+        while True:
+            quantum = int(input("Ingrese el quantum (2, 3, o 4): "))
+            if quantum not in [2, 3, 4]:
+                print("Quantum inválido. Debe ser 2, 3 o 4.")
+                continue
+
+            processes = []
+            for i in range(cant_procesos):
+                process_name = input("Ingrese el nombre del proceso: ")
                 while True:
-                    quantum = int(input("Ingrese el quantum (2, 3, o 4): "))
-                    if quantum not in [2, 3, 4]:
-                        print("Quantum inválido. Debe ser 2, 3 o 4.")
+                    burst_time = int(input("Ingrese el tiempo de ráfaga (1 - 15) para el proceso {}: ".format(process_name)))
+                    if burst_time < 1 or burst_time > 15:
+                        print("Tiempo de ráfaga inválido. Debe estar entre 1 y 15.")
                         continue
-
-                    processes = []
-                    for i in range(cant_procesos):
-                        process_name = input("Ingrese el nombre del proceso: ")
-                        while True:
-                            burst_time = int(
-                                input("Ingrese el tiempo de ráfaga (1 - 15) para el proceso {}: ".format(process_name)))
-                            if burst_time < 1 or burst_time > 15:
-                                print("Tiempo de ráfaga inválido. Debe estar entre 1 y 15.")
-                                continue
-                            while True:
-                                wait_time = int(input(
-                                    "Ingrese el tiempo de llegada (0 - 15) para el proceso {}: ".format(process_name)))
-                                if wait_time < 0 or wait_time > 15:
-                                    print("Tiempo de llegada inválido. Debe estar entre 0 y 15.")
-                                    continue
-                                else:
-                                    processes.append((process_name, burst_time, wait_time))
-                                    break
+                    while True:
+                        wait_time = int(input("Ingrese el tiempo de llegada (0 - 15) para el proceso {}: ".format(process_name)))
+                        if wait_time < 0 or wait_time > 15:
+                            print("Tiempo de llegada inválido. Debe estar entre 0 y 15.")
+                            continue
+                        else:
+                            processes.append((process_name, burst_time, wait_time))
                             break
+                    break
 
-                    print("El tiempo promedio de completación es: ", round_robin(processes, quantum))
-                    break  # Sale del bucle de procesos
+            print("El tiempo promedio de completación es: ", round_robin(processes, quantum))
+            break  # Sale del bucle de procesos
 
-                break  # Sale del bucle de quantum
-            return True
+        break  # Sale del bucle de quantum
 
         # Sale del bucle de cantidad de procesos
 
