@@ -1,3 +1,4 @@
+
 from collections import deque
 
 def round_robin(procesos, quantum):
@@ -28,40 +29,27 @@ def round_robin(procesos, quantum):
     return tiempo_promedio, tiempos_espera, tiempos_ejecucion
 
 
-
 def first_come_first_served(processes):
     time = 0
     completion_times = []
-    wait_times = []
-    process_names = []
-
-    for process in sorted(processes, key=lambda x: x[2]):  # Ordenar por tiempo de llegada
-        time = max(time, process[2])  # Actualizar el tiempo si el proceso llega más tarde
-        wait_time = max(0, time - process[2])  # Calcular tiempo de espera
-        wait_times.append(wait_time)
-        completion_times.append(time + min(process[1], 15))  # Limitar la ráfaga a 15
-        process_names.append(process[0])
-        time += min(process[1], 15)  # Avanzar en el tiempo
-
-    return sum(completion_times) / len(completion_times), wait_times, process_names
-
-
-
-def shortest_job_first(processes):
-    processes.sort(key=lambda x: (x[2], x[1]))  # Ordenar por tiempo de llegada y ráfaga
-    time = 0
-    completion_times = []
-    wait_times = []
     process_names = []
     for process in processes:
-        time = max(time, process[2])  # Actualizar el tiempo si el proceso llega más tarde
-        wait_time = max(0, time - process[2])
-        wait_times.append(wait_time)
         completion_times.append(time + min(process[1], 15))
         process_names.append(process[0])
         time += min(process[1], 15)
-    return sum(completion_times) / len(completion_times), wait_times, process_names
+    return sum(completion_times) / len(completion_times), process_names
 
+
+def shortest_job_first(processes):
+    processes.sort(key=lambda x: x[1])
+    time = 0
+    completion_times = []
+    process_names = []
+    for process in processes:
+        completion_times.append(time + min(process[1], 15))
+        process_names.append(process[0])
+        time += min(process[1], 15)
+    return sum(completion_times) / len(completion_times), process_names
 
 
 def menu():
@@ -100,26 +88,28 @@ def menu():
                     for i in range(cant_procesos):
                         process_name = input("Ingrese el nombre del proceso: ")
                         while True:
-                            burst_time = int(
-                                input("Ingrese el tiempo de ráfaga (1 - 15) para el proceso {}: ".format(process_name)))
+                            burst_time = int(input("Ingrese el tiempo de ráfaga (1 - 15) para el proceso {}: ".format(process_name)))
                             if burst_time < 1 or burst_time > 15:
                                 print("Tiempo de ráfaga inválido. Debe estar entre 1 y 15.")
                                 continue
+                            while True:
+                                wait_time = int(input("Ingrese el tiempo de llegada (0 - 15) para el proceso {}: ".format(process_name)))
+                                if wait_time < 0 or wait_time > 15:
+                                    print("Tiempo de llegada inválido. Debe estar entre 0 y 15.")
+                                    continue
+                                else:
+                                    processes.append({'nombre': process_name, 'tiempo_llegada': wait_time, 'tiempo_restante': burst_time})
+                                    break
+                            break
+                    impresion= round_robin(processes, quantum)
+                    print("El tiempo promedio de completación es: ", impresion[0], "Tiempo de espera: ", impresion[1], "Tiempo de ejecución: ", impresion[2])
+                    break  # Sale del bucle de procesos
 
-                            wait_time = int(input(
-                                "Ingrese el tiempo de llegada (0 - 15) para el proceso {}: ".format(process_name)))
-                            if wait_time < 0 or wait_time > 15:
-                                print("Tiempo de llegada inválido. Debe estar entre 0 y 15.")
-                                continue
-                            else:
-                                processes.append({'nombre': process_name, 'tiempo_llegada': wait_time, 'tiempo_restante': burst_time})
-                                break
-                    impresion = round_robin(processes, quantum)
-                    print("El tiempo promedio de completación es: ", impresion[0], "Tiempo de espera: ", impresion[1],
-                          "Tiempo de ejecución: ", impresion[2])
-                    break  # Sale del bucle de quantum si el valor es válido
+                break  # Sale del bucle de quantum
 
-                break  # Sale del bucle de cantidad de procesos
+        # Sale del bucle de cantidad de procesos
+        # Sale del bucle de cantidad de procesos
+
         # Opción 2: First Come First Served
         elif opc == 2:
             while True:
@@ -131,26 +121,10 @@ def menu():
                 processes = []
                 for i in range(cant_procesos):
                     process_name = input("Ingrese el nombre del proceso: ")
-                    while True:
-                        burst_time = int(
-                            input("Ingrese el tiempo de ráfaga (1 - 15) para el proceso {}: ".format(process_name)))
-                        if burst_time < 1 or burst_time > 15:
-                            print("Tiempo de ráfaga inválido. Debe estar entre 1 y 15.")
-                            continue
-                        while True:
-                            wait_time = int(input(
-                                "Ingrese el tiempo de llegada (0 - 15) para el proceso {}: ".format(process_name)))
-                            if wait_time < 0 or wait_time > 15:
-                                print("Tiempo de llegada inválido. Debe estar entre 0 y 15.")
-                                continue
-                            else:
-                                processes.append((process_name, burst_time, wait_time))
-                                break
-                        break
-
-                print("El tiempo promedio de completación es: ", first_come_first_served(processes)[0], "Tiempo de espera: ", first_come_first_served(processes)[1], "Procesos: ", first_come_first_served(processes)[2])
+                    burst_time = int(input("Ingrese el tiempo de ráfaga (1 - 15): "))
+                    processes.append((process_name, burst_time))
+                print("El tiempo promedio de completación es: ", first_come_first_served(processes))
                 break
-
 
         # Opción 3: Shortest Job First
         elif opc == 3:
@@ -163,32 +137,15 @@ def menu():
                 processes = []
                 for i in range(cant_procesos):
                     process_name = input("Ingrese el nombre del proceso: ")
-                    while True:
-                        burst_time = int(
-                            input("Ingrese el tiempo de ráfaga (1 - 15) para el proceso {}: ".format(process_name)))
-                        if burst_time < 1 or burst_time > 15:
-                            print("Tiempo de ráfaga inválido. Debe estar entre 1 y 15.")
-                            continue
-                        while True:
-                            wait_time = int(input(
-                                "Ingrese el tiempo de llegada (0 - 15) para el proceso {}: ".format(process_name)))
-                            if wait_time < 0 or wait_time > 15:
-                                print("Tiempo de llegada inválido. Debe estar entre 0 y 15.")
-                                continue
-                            else:
-                                processes.append((process_name, burst_time, wait_time))
-                                break
-                        break
-
-                print("El tiempo promedio de completación es: ", shortest_job_first(processes)[0] , "Tiempo de espera: ", shortest_job_first(processes)[1], "Procesos: ", shortest_job_first(processes)[2])
+                    burst_time = int(input("Ingrese el tiempo de ráfaga (1 - 15): "))
+                    processes.append((process_name, burst_time))
+                print("El tiempo promedio de completación es: ", shortest_job_first(processes))
                 break
-
 
         # Terminar programa
         return True
 
 
 valido = True
-while valido :
-    valido =  menu()
-
+while valido:
+    valido = menu()
