@@ -1,3 +1,50 @@
+def round_robin(processes, quantum):
+    n = len(processes)
+    remaining_burst_time = [min(process[1], 15) for process in processes]  # Limitar la ráfaga a 15
+    arrival_time = [process[2] for process in processes]  # Tiempos de llegada
+    completion_times = [0] * n
+    wait_times = [0] * n
+    t = 0  # Tiempo actual
+    process_names = [process[0] for process in processes]  # Lista de nombres de procesos
+
+    while True:
+        done = True
+        for i in range(n):
+            if remaining_burst_time[i] > 0:
+                done = False
+                if arrival_time[i] <= t:  # Verificar si el proceso ha llegado
+                    if remaining_burst_time[i] > quantum:
+                        t += quantum
+                        remaining_burst_time[i] -= quantum
+                    else:
+                        t += remaining_burst_time[i]
+                        wait_times[i] = t - arrival_time[i] - remaining_burst_time[i]  # Calcular tiempo de espera
+                        remaining_burst_time[i] = 0
+                        completion_times[i] = t
+        if done:
+            break
+
+    return sum(completion_times) / n, wait_times, process_names
+
+
+def first_come_first_served(processes):
+    time = 0
+    completion_times = []
+    wait_times = []
+    process_names = []
+
+    for process in sorted(processes, key=lambda x: x[2]):  # Ordenar por tiempo de llegada
+        time = max(time, process[2])  # Actualizar el tiempo si el proceso llega más tarde
+        wait_time = max(0, time - process[2])  # Calcular tiempo de espera
+        wait_times.append(wait_time)
+        completion_times.append(time + min(process[1], 15))  # Limitar la ráfaga a 15
+        process_names.append(process[0])
+        time += min(process[1], 15)  # Avanzar en el tiempo
+
+    return sum(completion_times) / len(completion_times), wait_times, process_names
+
+
+
 def shortest_job_first(processes):
     processes.sort(key=lambda x: (x[2], x[1]))  # Ordenar por tiempo de llegada y ráfaga
     time = 0
